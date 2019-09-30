@@ -205,6 +205,7 @@ int ackerman(int a, int b) {
   
   /* Here we allocate the memory using our own allocator. */
   char * mem = (char*)my_allocator->Malloc(to_alloc * sizeof(char));
+  cout<< "mem is "<<(void *)mem<< endl;
 
   num_allocations++;
 
@@ -233,12 +234,14 @@ int ackerman(int a, int b) {
        Let's check if the memory allocated above still has the same value. 
     */
     for (int i = 0; i < to_alloc; i++) {
+      //cout<<"i = "<< i <<" mem = "<< static_cast<int>(mem[i])  << ", c = "<< int(c) <<endl;
       if (mem[i] != c) {
+        cout<<"mem = "<< static_cast<int>(mem[i])  << ", c = "<< int(c) <<endl;
 	/* The value does not match. 
 	   It must have been overwritten somewhere. This is very bad. 
 	*/
 	cout << "Memory checking error!" << endl;
-	//assert(false);
+	assert(false);
       }
     }
 

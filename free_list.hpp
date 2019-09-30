@@ -67,17 +67,19 @@ class FreeList {
 
  private:
   SegmentHeader* header;
+  int fibNum=0;
   /* Here you add whatever private members you need...*/
 
 public:
   SegmentHeader* GetHeader();
 
-  FreeList(); 
+  FreeList(int fib_size); 
   /* This function initializes a new free-list. */
 
   ~FreeList(); 
   /* We probably don't need a destructor. */ 
-
+  void print();
+  
   bool Remove(SegmentHeader * _segment); 
   /* Remove the given segment from the given free list. 
      Returns true if the function succeeds.

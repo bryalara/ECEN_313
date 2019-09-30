@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 #include "free_list.hpp"
+#include <vector>
 
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */ 
@@ -46,7 +47,7 @@ class MyAllocator {
  private:
    size_t blockSize;
    char * start_addr;
-   FreeList frlist;
+   std::vector <FreeList> frlist;
  public:
   MyAllocator(size_t _basic_block_size, size_t _size); 
   /* This function initializes the memory allocator and makes a portion of 
@@ -67,6 +68,8 @@ class MyAllocator {
   /* Allocate _length number of bytes of free memory and returns the 
      address of the allocated portion. Returns nullptr when out of memory. 
   */ 
+
+   void initFrlist(size_t _size);
 
   bool Free(Addr _a); 
   /* Frees the section of physical memory previously allocated 

@@ -59,8 +59,9 @@ using namespace std;
 MyAllocator::MyAllocator(size_t _basic_block_size, size_t _size) {
   blockSize=_basic_block_size;
   start_addr= static_cast<char *> (std::malloc(_size));
-  SegmentHeader* newSegment = new(start_addr) SegmentHeader(_size, true);
-  frlist.Add(newSegment);
+  //initialize frlist vector
+  initFrlist(_size);// also creates segment header and puts it into frlist.
+
   //cout<<"orig: "<< &orig_start<<"\nstart_add: "<< &start_addr<<"\nAvailable: "<<&available<<endl;
   //cout<<"\norig: "<< static_cast<void*>(orig_start)<<"\nstart_add: "<< static_cast<void*>(start_addr)<<"\nAvailable: "<<static_cast<void*>(available)<<endl;
   
@@ -85,15 +86,20 @@ Addr MyAllocator::Malloc(size_t _length) {
   SegmentHeader* temp= frlist.GetHeader();
   
   while(temp != nullptr){
+    frlist.print();
     if(temp->length >= requiredLength /*&& temp->is_free==true*/){
-      size_t newLength= temp->length - requiredLength - sizeof(SegmentHeader);
-      SegmentHeader* newSegment = new(start_addr + requiredLength /*+ sizeof(SegmentHeader)*/) SegmentHeader(newLength - sizeof(SegmentHeader), true);
+      size_t newLength= temp->length - requiredLength /*- sizeof(SegmentHeader)*/;
+      SegmentHeader* newSegment = new(/*start_addr*/ temp + requiredLength /*+ sizeof(SegmentHeader)*/) SegmentHeader(newLength /*- sizeof(SegmentHeader)*/, true);
       frlist.Add(newSegment);
-      frlist.Remove(temp);
+      
+    frlist.print();
       temp->length=requiredLength;
-      cout<<newSegment<<endl;
       temp->is_free=false;
+      frlist.Remove(temp);
+
+    frlist.print();
       Addr p= newSegment;
+      cout<< "p "<<p<<endl;
       return p;
     }
     temp= temp->next;
@@ -101,6 +107,25 @@ Addr MyAllocator::Malloc(size_t _length) {
 
   return nullptr;
 
+
+}
+
+void MyAllocator::initFrlist(size_t _size){
+  int fib_prev=0;
+  int fib_prev1=1;
+  int fib_current=fib_prev1+fib_prev;
+  int index=-1;
+
+  int fib_increment=fib_current*blockSize ;
+  while(fib_increment <= _size){
+    FreeList fr(fib_increment);
+    frlist.push_back(fr);
+    index++;
+    fib_increment= blockSize*(fib_current+fib_prev1);
+  }
+
+  SegmentHeader* newSegment = new(start_addr) SegmentHeader(fib_increment, true);
+  frlist[index].Add(newSegment);
 
 }
 
@@ -114,9 +139,14 @@ Addr MyAllocator::Malloc(size_t _length) {
   
 
 bool MyAllocator::Free(Addr _a) {
-
+  cout<<"Freeing address: "<<_a<<endl<<endl;
   // This empty implementation just uses C standard library free
-  //std::free(_a);
+  SegmentHeader* flh= (SegmentHeader*) ((char*)_a - sizeof(SegmentHeader));
+  flh->is_free=true;
+  cout<<"flh = "<<flh<<endl;;
+  frlist.Add(flh);
+  frlist.print();
+  cout<<"Is address "<<(char*)_a<<" added to freelist?\n"<<endl;
   return true;
 }
 
