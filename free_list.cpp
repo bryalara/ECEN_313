@@ -55,10 +55,20 @@ using namespace std;
 /*--------------------------------------------------------------------------*/
 /* FUNCTIONS FOR CLASS SegmentHeader */
 /*--------------------------------------------------------------------------*/
-
 SegmentHeader::SegmentHeader(size_t _length, bool _is_free) {
   length = _length;
   is_free = _is_free;
+  cookie = COOKIE_VALUE;
+  next= nullptr;
+  prev= nullptr;
+  // You may need to initialize more members here!
+}
+
+SegmentHeader::SegmentHeader(size_t _length, bool _is_free, bool _LR, bool _INH) {
+  length = _length;
+  is_free = _is_free;
+  LR= _LR;
+  INH= _INH;
   cookie = COOKIE_VALUE;
   next= nullptr;
   prev= nullptr;
@@ -144,6 +154,9 @@ void FreeList::print(){
     temp= temp->next;
   }
 }
+
+
+
 
 bool FreeList::Remove(SegmentHeader * _segment) {
   SegmentHeader* temp=header;

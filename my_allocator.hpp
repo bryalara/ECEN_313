@@ -71,6 +71,9 @@ class MyAllocator {
 
    void initFrlist(size_t _size);
 
+   void split(SegmentHeader* available, int index);
+   void merge(SegmentHeader * _segment, int index);
+
   bool Free(Addr _a); 
   /* Frees the section of physical memory previously allocated 
      using ’Malloc’. Returns true if everything ok. */ 
